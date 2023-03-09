@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import '../models/transaction.dart';
 
+import './transaction_card.dart';
+
 class TransactionWidget extends StatefulWidget {
   const TransactionWidget({super.key});
 
@@ -99,17 +101,35 @@ class _TransactionWidgetState extends State<TransactionWidget> {
                     ],
                   ),
                 ),
-                Padding(
-                  //Add transaction button
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
-                  child: ElevatedButton(
-                      onPressed: _submitTransaction,
-                      style: ButtonStyle(
-                        backgroundColor:
-                            MaterialStateProperty.all<Color>(Colors.purple),
-                      ),
-                      child: const Text('Add Transaction')),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Padding(
+                      //Add transaction Minus
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 16),
+                      child: ElevatedButton(
+                          onPressed: () => _submitTransaction(-1),
+                          style: ButtonStyle(
+                            backgroundColor:
+                                MaterialStateProperty.all<Color>(Colors.red),
+                          ),
+                          child: const Text('-')),
+                    ),
+                    Padding(
+                      //Add transaction Plus
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 16),
+                      child: ElevatedButton(
+                          onPressed: () => _submitTransaction(1),
+                          style: ButtonStyle(
+                            backgroundColor:
+                                MaterialStateProperty.all<Color>(Colors.green),
+                          ),
+                          child: const Text('+')),
+                    ),
+                  ],
                 ),
                 SizedBox(
                   //List of transactions
@@ -118,48 +138,7 @@ class _TransactionWidgetState extends State<TransactionWidget> {
                   child: ListView.builder(
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
-                      return Card(
-                        elevation: 5,
-                        child: Row(
-                          children: [
-                            Container(
-                              margin: const EdgeInsets.symmetric(
-                                  horizontal: 15, vertical: 10),
-                              decoration: BoxDecoration(
-                                border: Border.all(
-                                  color: Colors.purple,
-                                  width: 2,
-                                ),
-                              ),
-                              padding: const EdgeInsets.all(10),
-                              child: Text(
-                                '\$${_transactionsList[index].amount}',
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 20,
-                                  color: Colors.purple,
-                                ),
-                              ),
-                            ),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(_transactionsList[index].title,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 18,
-                                    )),
-                                Text(
-                                  '${_transactionsList[index].date.hour}:${_transactionsList[index].date.minute} ${_transactionsList[index].date.day}/${_transactionsList[index].date.month}/${_transactionsList[index].date.year}',
-                                  style: const TextStyle(
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ),
-                      );
+                      return TransactionCard(_transactionsList[index]);
                     },
                     itemCount: _transactionsList.length,
                   ),
@@ -172,16 +151,16 @@ class _TransactionWidgetState extends State<TransactionWidget> {
     );
   }
 
-  void _submitTransaction() {
+  void _submitTransaction(int sign) {
     if (_formKey.currentState!.validate()) {
       Transaction newTransaction = Transaction(
-        amount: double.parse(_amountController.text),
+        amount: double.parse(_amountController.text) * sign,
         title: _descriptionController.text,
         description: _descriptionController.text,
         date: DateTime.now(),
       );
       setState(() {
-        _transactionsList.add(newTransaction);
+        _transactionsList.insert(0, newTransaction);
       });
     }
   }
