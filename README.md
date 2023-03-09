@@ -1,3 +1,3 @@
-# smerkel
+# Smerkel
 
-A new Flutter project.
+Flutter app to track your everyday expenses.
