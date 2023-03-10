@@ -131,14 +131,26 @@ class _TransactionWidgetState extends State<TransactionWidget> {
                     ),
                   ],
                 ),
+                const Divider(
+                  color: Colors.grey,
+                  thickness: 1,
+                ),
                 SizedBox(
                   //List of transactions
                   height: 300,
                   width: 300,
                   child: ListView.builder(
+                    physics: const AlwaysScrollableScrollPhysics(),
                     shrinkWrap: true,
                     itemBuilder: (context, index) {
-                      return TransactionCard(_transactionsList[index]);
+                      return TransactionCard(
+                        _transactionsList[index],
+                        transactionRemoveCallback: (Transaction transaction) {
+                          setState(() {
+                            _transactionsList.remove(transaction);
+                          });
+                        },
+                      );
                     },
                     itemCount: _transactionsList.length,
                   ),
@@ -155,7 +167,7 @@ class _TransactionWidgetState extends State<TransactionWidget> {
     if (_formKey.currentState!.validate()) {
       Transaction newTransaction = Transaction(
         amount: double.parse(_amountController.text) * sign,
-        title: _descriptionController.text,
+        title: _titleController.text,
         description: _descriptionController.text,
         date: DateTime.now(),
       );

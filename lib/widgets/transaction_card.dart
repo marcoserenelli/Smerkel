@@ -3,8 +3,10 @@ import 'dart:math';
 import '../models/transaction.dart';
 
 class TransactionCard extends StatefulWidget {
+  const TransactionCard(this.transactionItem,
+      {super.key, required this.transactionRemoveCallback});
   final Transaction transactionItem;
-  const TransactionCard(this.transactionItem, {super.key});
+  final TransactionRemoveCallback transactionRemoveCallback;
 
   @override
   State<TransactionCard> createState() => _TransactionCardState();
@@ -70,9 +72,14 @@ class _TransactionCardState extends State<TransactionCard>
                         _controller.reverse();
                       }
                     },
+                    //main card
                     child: Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
                       children: [
+                        //Price
                         Container(
+                          width: 120,
+                          height: 60,
                           margin: const EdgeInsets.symmetric(
                               horizontal: 15, vertical: 10),
                           decoration: BoxDecoration(
@@ -84,33 +91,45 @@ class _TransactionCardState extends State<TransactionCard>
                             ),
                           ),
                           padding: const EdgeInsets.all(10),
-                          child: Text(
-                            '€ ${transactionItem.amount}',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 20,
-                              color: transactionItem.amount < 0
-                                  ? Colors.red
-                                  : Colors.green,
+                          child: FittedBox(
+                            child: Text(
+                              '€ ${transactionItem.amount.toStringAsFixed(transactionItem.amount.truncateToDouble() == transactionItem.amount ? 0 : 2)}',
+                              textAlign: TextAlign.justify,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 10,
+                                color: transactionItem.amount < 0
+                                    ? Colors.red
+                                    : Colors.green,
+                              ),
                             ),
                           ),
                         ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(transactionItem.title,
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                transactionItem.title,
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                )),
-                            Text(
-                              '${transactionItem.date.hour}:${transactionItem.date.minute} ${transactionItem.date.day}/${transactionItem.date.month}/${transactionItem.date.year}',
-                              style: const TextStyle(
-                                color: Colors.grey,
+                                  fontSize: 20,
+                                ),
+                                overflow: TextOverflow.ellipsis,
+                                textAlign: TextAlign.start,
+                                maxLines: 1,
+                                softWrap: false,
                               ),
-                            ),
-                          ],
+                              Text(
+                                '${transactionItem.date.hour}:${transactionItem.date.minute} ${transactionItem.date.day}/${transactionItem.date.month}/${transactionItem.date.year}',
+                                style: const TextStyle(
+                                  fontSize: 15,
+                                  color: Colors.grey,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ],
                     ),
@@ -130,15 +149,18 @@ class _TransactionCardState extends State<TransactionCard>
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                         children: [
                           IconButton(
-                            onPressed: () => {},
+                            onPressed: () => {
+                              widget.transactionRemoveCallback(transactionItem)
+                            },
                             icon: const Icon(
                               Icons.delete,
                               color: Colors.red,
-                              //Remove transaction from list
                             ),
                           ),
                           IconButton(
-                            onPressed: () => {},
+                            onPressed: () => {
+                              //TODO: implement open in new page
+                            },
                             icon: const Icon(
                               Icons.open_in_full,
                               color: Colors.blue,
@@ -168,3 +190,5 @@ class _TransactionCardState extends State<TransactionCard>
     );
   }
 }
+
+typedef TransactionRemoveCallback = void Function(Transaction transaction);
